@@ -10,7 +10,7 @@
 
 *  This will produce either a completed puzzle or an error message.
 
--  NOTE: some puzzles may be solvable in more than two seconds;
+*  NOTE: some puzzles may be solvable in more than two seconds;
 
 * The backtracking algorithm was initially sourced from: http://shadowhackit.blogspot.com/2015/10/C6.html    
 
