@@ -1,6 +1,6 @@
 /********************************************************/
 /*Ronald Espinoza                                       */
-/*4/8/2020                                              */
+/*4/2/2020                                              */
 /*CS-241 Section 005                                    */
 /*                                                      */
 /*Purpose:                                              */
@@ -24,15 +24,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-/*definitions for ASCII values used*/
-#define BASE_TEN_START  48/*0*/
-#define BASE_TEN_END    57/*9*/
-#define UNKNOWN         46/*.*/
-#define CARRIAGE_RETURN 13/*CR*/
-#define NEW_LINE        10/*LF*/
-#define LINE_SIZE       81/*line size limit*/
-#define BOARD_SIZE      9/*length/width of board*/
-#define RUN_TIME_LIMIT  2000000/*2 seconds*/
+
+#define BASE_TEN_START  48
+#define BASE_TEN_END    57
+#define UNKNOWN         46
+#define LINE_SIZE       81
+#define CARRIAGE_RETURN 13
+#define NEW_LINE        10
+#define LINE_SIZE       81
+#define RESET           46
+#define BOARD_SIZE      9
 
 /*global container for the current puzzle in play*/
 char parsedBoard[BOARD_SIZE][BOARD_SIZE] = 
@@ -57,15 +58,15 @@ int col = 0;
 long int runTimeLimit = 0;
 
 /*static values collected from box indicies*/
-static int box1[] = {1,2,3,10,11,12,19,20,21};
-static int box2[] = {4,5,6,13,14,15,22,23,24};
-static int box3[] = {7,8,9,16,17,18,25,26,27};
-static int box4[] = {28,29,30,37,38,39,46,47,48};
-static int box5[] = {31,32,33,40,41,42,49,50,51};
-static int box6[] = {34,35,36,43,44,45,52,53,54};
-static int box7[] = {55,56,57,64,65,66,73,74,75};
-static int box8[] = {58,59,60,67,68,69,76,77,78};
-static int box9[] = {61,62,63,70,71,72,79,80,81};
+int box1[] = {1,2,3,10,11,12,19,20,21};
+int box2[] = {4,5,6,13,14,15,22,23,24};
+int box3[] = {7,8,9,16,17,18,25,26,27};
+int box4[] = {28,29,30,37,38,39,46,47,48};
+int box5[] = {31,32,33,40,41,42,49,50,51};
+int box6[] = {34,35,36,43,44,45,52,53,54};
+int box7[] = {55,56,57,64,65,66,73,74,75};
+int box8[] = {58,59,60,67,68,69,76,77,78};
+int box9[] = {61,62,63,70,71,72,79,80,81};
 
 /********************************************************/
 /*Name: setRowCellStartIndex                            */
@@ -695,7 +696,7 @@ bool isEmptyCell(char parsedBoard[BOARD_SIZE][BOARD_SIZE])
     {
       theChar = parsedBoard[width][length];
       currChar = adjustCellValue(theChar);
-      if(currChar == UNKNOWN)
+      if(currChar == RESET)
       {/*A blank cell value has been found*/
         row = width;
         col = length;
@@ -881,7 +882,7 @@ bool hasSolution(char parsedBoard[BOARD_SIZE][BOARD_SIZE])
   char digitAsChar = 'X';
   /*increment is here due to recursive calls*/
   runTimeLimit++;
-  if(runTimeLimit > RUN_TIME_LIMIT)
+  if(runTimeLimit > 2000000)
   {/*hardcoded constraint for 2 million iterations*/
     return false;
   }
@@ -906,7 +907,7 @@ bool hasSolution(char parsedBoard[BOARD_SIZE][BOARD_SIZE])
       row = prevRow;
       col = prevCol;
       /*reset the board piece on rollback*/
-      parsedBoard[row][col]=UNKNOWN;
+      parsedBoard[row][col]=RESET;
     }
   }
   return false;
@@ -922,7 +923,7 @@ bool hasSolution(char parsedBoard[BOARD_SIZE][BOARD_SIZE])
 /*Description:                                          */
 /*This function resets the parsedBoard                  */
 /*Functions' Algorithm                                  */
-/*for all pieces in the board set the cell to UNKNOWN   */
+/*for all pieces in the board set the cell to RESET '.' */
 /********************************************************/
 void resetParsedBoard()
 {
@@ -932,7 +933,7 @@ void resetParsedBoard()
   {
     for(colCount = 0; colCount < BOARD_SIZE; colCount++)
     {
-      parsedBoard[rowCount][colCount] = UNKNOWN;
+      parsedBoard[rowCount][colCount] = RESET;
     }
   }
 }
@@ -1169,6 +1170,61 @@ bool noDuplicates(char buff[])
 }
 
 /********************************************************/
+/*Name: fileOpened                                      */
+/*Params:  FILE *fp                                     */
+/*Datatype:bool, input or output: output                */
+/*  - Def: check existence of file pointer              */
+/*  - range of values: TRUE or FALSE                    */
+/*Functions' return value: is there a file?             */
+/*Description:                                          */
+/*This function returns true if there is a file         */
+/*Functions' Algorithm                                  */
+/*if(file point doesn't exist)                          */
+/*  return there was no file                            */
+/*else                                                  */
+/*  default return, there was a file                    */
+/********************************************************/
+bool fileOpened(FILE *fp)
+{
+  if(fp == NULL)
+  {/*check if pointer has a value*/
+    return false;
+  }
+  else
+  {/*default to true for all fp values != 0*/
+    return true;
+  }
+}
+
+/********************************************************/
+/*Name: checkTerminalInput                              */
+/*Params: int arg_count                                 */
+/*Datatype:Void, input or output: input                 */
+/*  - Def: check if there was filename supplied         */
+/*  - range of values: any characters after ./a.out '---*/
+/*Functions' Data-Type: Void                            */
+/*Functions' return value: N/A                          */
+/*Description:                                          */
+/*This function exits the program if there was no file  */
+/*  name provided                                       */
+/*Functions' Algorithm                                  */
+/*if(file name doesn't exist)                           */
+/*  print error message                                 */
+/*  exit program as there are no records                */
+/*else                                                  */
+/*  default return, there was a file name               */
+/********************************************************/
+void checkTerminalInput(int arg_count)
+{
+  /* in.txt makes the arg_count = 2*/
+  if(arg_count != 2)
+  {/*"Error: No File name was provided!\n"*/
+    exit(1);
+  }
+  return;
+}
+
+/********************************************************/
 /*Name:isUnknown                                        */
 /*Params: char currChar                                 */
 /*Datatype:Bool, input or output: output                */
@@ -1355,16 +1411,35 @@ void readRecord(char buff[])
 /*Description:                                          */
 /*This function opens and reads the records from a file */
 /*Functions' Algorithm                                  */
-/*while reading the file till the end of the file       */
+/*if there was a file name supplied open the file       */
+/*See if the file opened                                */
+/*  while reading the file till the end of the file     */
 /*    read the records in the file                      */
+/*else there was no data in the file                    */
+/*and mains return will be in an error state            */
 /********************************************************/
-int main(int arg_count, char *cmdLine_params[])
+int main(int arg_count, char *file_name[])
 {
+  int mainsReturn = 1;
+  FILE *fp;/*TODO*/
   char buff[128];
-  /*loop through the text in the file till EOF*/
-  while(fgets(buff, sizeof(buff), stdin) != NULL)
-  {/*this will hang if stdin has no input*/
-    readRecord(buff);
+  /*validate an input file was supplied*/
+  checkTerminalInput(arg_count);
+  fp = fopen(file_name[1], "r");/*read the file*/
+  if(fileOpened(fp))
+  {/*loop through the text in the file till EOF*/
+    while(fgets(buff, sizeof(buff), fp) != NULL)
+    {
+      readRecord(buff);
+    }/*all code executed properly*/
+    mainsReturn = 0;
   }
-  return 0;
+  else
+  {/*"Error: There is no data in File!\n"*/
+    printf("missing File!!!\n");
+    exit(1);
+  }
+  /*release the file*/
+  fclose(fp);
+  return mainsReturn;
 }
