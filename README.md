@@ -1,10 +1,10 @@
 # Sudoku-Solver
 
-<h2>Purpose:                                              
+<h2>Purpose:</h2>                                              
 *  This program tries to solve each sudoku puzzle in   
  two seconds or less.    
   
-<h2>How to Use this source file:                          
+<h2>How to Use this source file:</h2>                          
 *  This program compiles using gcc -o sudoku sudoku.c
   and can be run using ./sudoku testSudoku.in             
 *  This will produce either a completed puzzle or an   
